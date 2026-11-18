@@ -1,0 +1,210 @@
+<%- include('partials/header', { title: post.title, user: user }) %>
+
+<style>
+  .post-page { padding: 3rem 0 2rem; }
+  .post-wrap { max-width: 820px; margin: 0 auto; }
+  .article { padding: clamp(1.5rem, 4vw, 3rem); overflow: hidden; animation: blog-rise .7s var(--ease) backwards; }
+  .article-title { margin-bottom: 1.1rem; font-size: clamp(2.1rem, 5.5vw, 3.4rem); letter-spacing: -.04em; line-height: 1.06; }
+  .post-byline { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.1rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); font-size: .95rem; }
+  .read-time { display: inline-flex; align-items: center; gap: .4rem; padding: .2rem .7rem; border-radius: 999px; color: var(--brand-d); font-size: .82rem; font-weight: 600; background: var(--brand-l); }
+  .post-content { margin-bottom: 0; color: var(--ink-2); font-size: 1.12rem; line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .section-title { margin: 2.5rem 0 1rem; font-size: 1.2rem; letter-spacing: -.01em; }
+
+  /* Gallery + lightbox */
+  .gallery-item img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-md); cursor: zoom-in; box-shadow: var(--shadow-1); transition: transform .4s var(--ease), box-shadow .4s var(--ease), filter .3s; }
+  .gallery-item img:hover { transform: translateY(-4px) scale(1.015); box-shadow: var(--shadow-2); filter: saturate(1.08); }
+  .lightbox { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 2rem; background: rgba(10,20,30,.9); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lightbox img { max-width: min(1100px, 100%); max-height: 86vh; border-radius: var(--r-md); box-shadow: 0 30px 80px rgba(0,0,0,.5); transform: scale(.92); transition: transform .4s var(--ease); }
+  .lightbox.open img { transform: none; }
+  .lightbox-close { position: absolute; top: 1.2rem; right: 1.2rem; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; color: #fff; background: rgba(255,255,255,.1); transition: background .2s, color .2s, transform .25s var(--ease); }
+  .lightbox-close:hover { color: var(--ink); background: var(--mark); transform: rotate(90deg); }
+
+  /* Author actions */
+  .post-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .post-actions form { margin: 0; }
+  .post-actions .btn-danger { color: var(--danger); border-color: transparent; background: var(--danger-l); box-shadow: none; }
+  .post-actions .btn-danger:hover { color: #fff; background: var(--danger); }
+
+  /* Comments */
+  .comments-card { margin-top: 1.75rem; padding: clamp(1.25rem, 3vw, 2rem); }
+  .comments-title { display: flex; align-items: center; gap: .7rem; margin-bottom: 1rem; font-size: 1.55rem; }
+  .comments-count { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 .55rem; border-radius: 999px; color: var(--ink); font-family: var(--font-body); font-size: .85rem; font-weight: 700; background: var(--mark); }
+  .comment-list { margin: 0; padding: 0; list-style: none; }
+  .comment { display: flex; align-items: flex-start; gap: .9rem; padding: 1.1rem .75rem; border: 0; border-bottom: 1px solid var(--line); border-radius: var(--r-md); background: transparent; transition: background .25s; }
+  .comment:last-child { border-bottom: 0; }
+  .comment:hover { background: #f6f9f9; }
+  .comment-avatar { display: grid; flex: 0 0 40px; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #fff; font-family: var(--font-display); font-size: 1rem; font-weight: 700; background: linear-gradient(135deg, var(--brand), var(--ink-2)); }
+  .comment-main { flex: 1; min-width: 0; }
+  .comment-author { display: block; color: var(--ink); font-size: .95rem; }
+  .comment-text { display: block; margin-top: .15rem; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .comment-actions { display: flex; gap: .4rem; opacity: .55; transition: opacity .2s; }
+  .comment:hover .comment-actions, .comment:focus-within .comment-actions { opacity: 1; }
+  .comment-actions form { margin: 0; }
+  .comment-actions .btn-danger { color: var(--danger); border-color: transparent; background: var(--danger-l); box-shadow: none; }
+  .comment-actions .btn-danger:hover { color: #fff; background: var(--danger); }
+  .empty-note { display: flex; align-items: center; gap: .7rem; margin: 0; padding: 1.4rem; border: 2px dashed #c9d5dc; border-radius: var(--r-md); color: var(--muted); }
+  .empty-note i { color: var(--brand); font-size: 1.2rem; }
+  .comment-form { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .comment-form textarea { min-height: 110px; max-height: 340px; }
+  .login-note { margin: 1.5rem 0 0; padding: 1rem 1.25rem; border-radius: var(--r-md); color: var(--ink-2); background: var(--mark-l); }
+  @media (max-width: 575.98px) { .comment { flex-wrap: wrap; } .comment-actions { opacity: 1; margin-left: 52px; } }
+</style>
+
+<main class="post-page">
+  <div class="container">
+    <div class="post-wrap">
+      <div class="card article">
+        <div>
+          <h1 class="article-title"><%= post.title %></h1>
+          <p class="post-byline text-muted">
+            by <%= post.author.username %> on <%= post.createdAt.toDateString()
+            %>
+          </p>
+          <p class="post-content"><%= post.content %></p>
+
+          <h2 class="section-title">Images</h2>
+          <div class="row post-gallery">
+            <% post.images.forEach(image => { %>
+            <div class="col-md-6 mb-3 gallery-item">
+              <img src="<%= image.url %>" alt="Post Image" class="img-fluid" />
+            </div>
+            <% }) %>
+          </div>
+
+          <% if (user && user._id.toString() === post.author._id.toString()) {
+          %>
+          <!-- Only show to the author -->
+          <div class="post-actions">
+            <a href="/posts/<%= post._id %>/edit" class="btn btn-primary">
+              <i class="fas fa-edit"></i> Edit Post
+            </a>
+            <form
+              action="/posts/<%= post._id %>?_method=DELETE"
+              method="POST"
+              class="d-inline"
+            >
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Delete Post
+              </button>
+            </form>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card comments-card">
+        <div>
+          <h2 class="comments-title">Comments <span class="comments-count"><%= post.comments.length %></span></h2>
+          <% if (post.comments.length > 0) { %>
+          <ul class="comment-list list-group list-group-flush">
+            <% post.comments.forEach(comment => { %>
+            <li class="comment list-group-item">
+              <div class="comment-main">
+                <strong class="comment-author"><%= comment.author.username %></strong>
+                <span class="comment-text"><%=
+                comment.content %></span>
+              </div>
+              <% if (user && user._id.toString() ===
+              comment.author._id.toString()) { %>
+              <!-- Only show to the author -->
+              <div class="comment-actions">
+                <a
+                  href="/comments/<%= comment._id %>/edit"
+                  class="btn btn-sm btn-secondary"
+                >
+                  <i class="fas fa-edit"></i> Edit
+                </a>
+                <form
+                  action="/comments/<%= comment._id %>?_method=DELETE"
+                  method="POST"
+                  class="d-inline"
+                >
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete
+                  </button>
+                </form>
+              </div>
+              <% } %>
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p class="empty-note"><i class="far fa-comment-dots"></i> No comments yet.</p>
+          <% } %> <% if (user) { %>
+          <form
+            action="/posts/<%= post._id %>/comments"
+            method="POST"
+            class="comment-form"
+          >
+            <div class="form-group">
+              <textarea
+                name="content"
+                rows="4"
+                class="form-control"
+                placeholder="Add a comment..."
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Comment</button>
+          </form>
+          <% } else { %>
+          <p class="login-note"><a href="/auth/login">Login</a> to add a comment.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  (function () {
+    /* Reading time next to the byline */
+    var content = document.querySelector(".post-content");
+    var byline = document.querySelector(".post-byline");
+    if (content && byline) {
+      var words = (content.textContent.trim().match(/\S+/g) || []).length;
+      var chip = document.createElement("span");
+      chip.className = "read-time";
+      chip.innerHTML = '<i class="far fa-clock"></i> ' + Math.max(1, Math.round(words / 200)) + " min read";
+      byline.appendChild(chip);
+    }
+
+    /* Hide the "Images" heading when the post has none */
+    var gallery = document.querySelector(".post-gallery");
+    if (gallery && !gallery.querySelector("img")) gallery.previousElementSibling.hidden = true;
+
+    /* Initial-letter avatars for comments */
+    document.querySelectorAll(".comment").forEach(function (li) {
+      var name = li.querySelector(".comment-author").textContent.trim();
+      var av = document.createElement("span");
+      av.className = "comment-avatar"; av.setAttribute("aria-hidden", "true");
+      av.textContent = (name.charAt(0) || "?").toUpperCase();
+      li.insertBefore(av, li.firstChild);
+    });
+
+    /* Auto-growing comment box */
+    var box = document.querySelector(".comment-form textarea");
+    if (box) box.addEventListener("input", function () { box.style.height = "auto"; box.style.height = box.scrollHeight + 2 + "px"; });
+
+    /* Image lightbox */
+    var imgs = document.querySelectorAll(".gallery-item img");
+    if (!imgs.length) return;
+    var lb = document.createElement("div");
+    lb.className = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", "Image preview");
+    lb.innerHTML = '<button type="button" class="lightbox-close" aria-label="Close preview"><i class="fas fa-times"></i></button><img alt="" />';
+    document.body.appendChild(lb);
+    var big = lb.querySelector("img");
+    function close() { lb.classList.remove("open"); }
+    imgs.forEach(function (img) {
+      img.tabIndex = 0; img.setAttribute("role", "button");
+      function open() { big.src = img.src; lb.classList.add("open"); lb.querySelector("button").focus(); }
+      img.addEventListener("click", open);
+      img.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+    });
+    lb.addEventListener("click", function (e) { if (e.target !== big) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+  })();
+</script>
+
+<%- include('partials/footer') %>

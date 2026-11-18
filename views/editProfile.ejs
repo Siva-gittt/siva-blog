@@ -1,0 +1,155 @@
+<%- include('partials/header', { title: 'Edit Profile', user: user }) %>
+
+<style>
+  .composer-page { padding: 3rem 0 2rem; }
+  .composer { max-width: 760px; margin: 0 auto; overflow: hidden; animation: blog-rise .7s var(--ease) backwards; }
+  .composer-head { display: flex; align-items: center; gap: 1rem; padding: 1.7rem 2rem; border-bottom: 1px solid var(--line); background: linear-gradient(120deg, rgba(15,139,141,.1), rgba(255,210,63,.16)); }
+  .composer-icon { display: grid; flex: 0 0 52px; place-items: center; width: 52px; height: 52px; border-radius: 16px; font-size: 1.25rem; color: var(--mark); background: var(--ink); box-shadow: 0 10px 20px -8px rgba(15,30,43,.6); }
+  .composer-head h2 { margin: 0; font-size: 1.8rem; letter-spacing: -.03em; }
+  .composer .card-body { padding: 2rem; }
+
+  /* Avatar uploader: preview + dropzone side by side */
+  .avatar-field { display: flex; align-items: center; gap: 1.5rem; }
+  .avatar-preview { position: relative; display: grid; flex: 0 0 132px; place-items: center; width: 132px; height: 132px; border-radius: 50%; color: var(--soft); font-size: 2.6rem; background: #eaf0f2; box-shadow: 0 0 0 5px #fff, var(--shadow-2); }
+  .avatar-preview:before { content: "\f007"; position: absolute; font-family: "Font Awesome 5 Free"; font-weight: 900; }
+  .avatar-preview img { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; max-width: none; padding: 0; border: 0; border-radius: 50%; object-fit: cover; }
+  #image-preview { display: none; animation: blog-pop .4s var(--ease) backwards; }
+  .dropzone { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; min-height: 132px; padding: 1.25rem; color: var(--muted); text-align: center; border: 2px dashed #c3d0d8; border-radius: var(--r-md); background: #f9fbfb; transition: border-color .25s, background .25s, transform .25s var(--ease); }
+  .dropzone:hover, .dropzone:focus-within, .dropzone.is-over { border-color: var(--brand); background: var(--brand-l); }
+  .dropzone.is-over { transform: scale(1.012); }
+  .dropzone input.form-control { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; box-shadow: none; }
+  .dropzone-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: .2rem; border-radius: 14px; font-size: 1.15rem; color: var(--brand-d); background: #fff; box-shadow: var(--shadow-1); transition: transform .3s var(--ease); }
+  .dropzone:hover .dropzone-icon, .dropzone.is-over .dropzone-icon { transform: translateY(-4px); }
+  .dropzone strong { color: var(--ink); }
+  .dropzone-count { min-height: 1.2em; color: var(--brand-d); font-size: .85rem; font-weight: 600; }
+  #bio { min-height: 110px; }
+  .composer-actions { display: flex; justify-content: flex-end; margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  @media (max-width: 575.98px) { .composer-head, .composer .card-body { padding: 1.4rem; } .avatar-field { flex-direction: column; align-items: stretch; } .avatar-preview { align-self: center; } .composer-actions .btn { width: 100%; } }
+</style>
+
+<main class="composer-page">
+  <div class="container">
+    <div class="card composer">
+      <div class="card-header composer-head">
+        <span class="composer-icon"><i class="fas fa-user-edit"></i></span>
+        <h2>Edit Profile</h2>
+      </div>
+      <div class="card-body">
+        <form
+          action="/user/edit"
+          method="POST"
+          enctype="multipart/form-data"
+          onsubmit="return validateForm()"
+        >
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              name="username"
+              id="username"
+              value="<%= user.username %>"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              name="email"
+              id="email"
+              value="<%= user.email %>"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="bio" class="form-label">Bio</label>
+            <textarea class="form-control" name="bio" id="bio" rows="3">
+<%= user.bio %></textarea
+            >
+          </div>
+          <div class="mb-3">
+            <label for="profilePicture" class="form-label">Profile Picture</label>
+            <div class="avatar-field">
+              <div class="avatar-preview">
+                <% if (user.profilePicture && user.profilePicture.url) { %>
+                <img
+                  src="<%= user.profilePicture.url %>"
+                  alt="Profile Picture"
+                  id="currentProfilePicture"
+                />
+                <% } %>
+                <img
+                  id="image-preview"
+                  alt="New profile picture preview"
+                />
+              </div>
+              <div class="dropzone" id="dropzone">
+                <input
+                  class="form-control"
+                  type="file"
+                  name="profilePicture"
+                  id="profilePicture"
+                  title=""
+                  onchange="previewImage()"
+                />
+                <span class="dropzone-icon"><i class="fas fa-camera"></i></span>
+                <strong>Drop a photo here</strong>
+                <span>or click to browse</span>
+                <span class="dropzone-count" id="file-name" aria-live="polite"></span>
+              </div>
+            </div>
+          </div>
+          <div class="composer-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Update Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function previewImage() {
+    const preview = document.getElementById("image-preview");
+    const file = document.getElementById("profilePicture").files[0];
+    const currentImage = document.getElementById("currentProfilePicture");
+
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+      if (currentImage) {
+        currentImage.style.display = "none";
+      }
+    } else {
+      preview.style.display = "none";
+      if (currentImage) {
+        currentImage.style.display = "block";
+      }
+    }
+  }
+
+  function validateForm() {
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    if (!username || !email) {
+      alert("Username and Email are required.");
+      return false;
+    }
+    return true;
+  }
+</script>
+<script>
+  /* Cosmetic helpers: dropzone highlight + chosen file name */
+  (function () {
+    var zone = document.getElementById("dropzone"), input = document.getElementById("profilePicture"), name = document.getElementById("file-name");
+    ["dragenter", "dragover"].forEach(function (ev) { zone.addEventListener(ev, function () { zone.classList.add("is-over"); }); });
+    ["dragleave", "drop"].forEach(function (ev) { zone.addEventListener(ev, function () { zone.classList.remove("is-over"); }); });
+    input.addEventListener("change", function () { name.textContent = input.files[0] ? input.files[0].name : ""; });
+  })();
+</script>
+
+<%- include('partials/footer') %>

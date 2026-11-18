@@ -1,0 +1,156 @@
+<%- include('partials/header', { title: 'Home', user: user }) %>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero-section { position: relative; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - var(--nav-h)); min-height: calc(100svh - var(--nav-h)); padding: 6rem 1rem 7rem; overflow: hidden; color: #fff; isolation: isolate; }
+  .hero-bg { position: absolute; inset: -5%; z-index: -3; background: url("https://cdn.pixabay.com/photo/2019/06/01/02/14/lake-4243352_1280.jpg") center / cover no-repeat; animation: hero-drift 28s ease-in-out infinite alternate; }
+  .hero-shade { position: absolute; inset: 0; z-index: -2; background: radial-gradient(60% 60% at 18% 28%, rgba(15,139,141,.4), transparent 70%), linear-gradient(180deg, rgba(15,30,43,.72), rgba(15,30,43,.6) 45%, rgba(15,30,43,.94)); }
+  .hero-orb { position: absolute; z-index: -1; border-radius: 50%; filter: blur(64px); transition: transform .6s ease-out; }
+  .orb-a { left: -90px; bottom: -110px; width: 360px; height: 360px; background: var(--brand); opacity: .5; }
+  .orb-b { right: -70px; top: 12%; width: 270px; height: 270px; background: var(--mark); opacity: .26; }
+  .hero-content { max-width: 880px; }
+  .hero-content > * { animation: blog-rise .9s var(--ease) backwards; }
+  .hero-content > *:nth-child(1) { animation-delay: .1s; }
+  .hero-content > *:nth-child(2) { animation-delay: .28s; }
+  .hero-content > *:nth-child(3) { animation-delay: .46s; }
+  .hero-content > *:nth-child(4) { animation-delay: .62s; }
+  .hero-title { margin-bottom: 1.25rem; color: #fff; font-size: clamp(2.7rem, 7.5vw, 5.4rem); font-weight: 800; letter-spacing: -.04em; line-height: 1.02; }
+  .hero-section .hero-lead { margin-bottom: 2rem; color: rgba(255,255,255,.84); font-size: clamp(1.1rem, 2.2vw, 1.45rem); font-weight: 400; }
+  .hero-greeting { margin-bottom: 1.75rem; color: rgba(255,255,255,.9); font-size: 1.15rem; }
+  .username { padding: .08em .5em; border-radius: 8px; color: #fff; font-weight: 700; background: linear-gradient(var(--mark), var(--mark)) left / 0% 100% no-repeat; animation: mark-in .8s .9s var(--ease) forwards; }
+  .hero-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .9rem; margin: 0; color: rgba(255,255,255,.88); font-size: 1.05rem; }
+  .hero-scroll { position: absolute; left: 50%; bottom: 1.8rem; display: grid; place-items: center; width: 46px; height: 46px; margin-left: -23px; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; color: #fff; background: rgba(255,255,255,.08); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); text-decoration: none !important; transition: background .2s, color .2s, border-color .2s; }
+  .hero-scroll i { animation: hero-bounce 1.8s ease-in-out infinite; }
+  .hero-scroll:hover { color: var(--ink); background: var(--mark); border-color: var(--mark); }
+  @keyframes hero-drift { from { transform: scale(1) translate3d(0,0,0); } to { transform: scale(1.1) translate3d(-1.5%,-1%,0); } }
+  @keyframes hero-bounce { 0%,100% { transform: translateY(-2px); } 50% { transform: translateY(4px); } }
+  @keyframes mark-in { 40% { color: #fff; } 100% { background-size: 100% 100%; color: var(--ink); } }
+
+  /* ---------- Features ---------- */
+  .features { padding: 5.5rem 0 1rem; scroll-margin-top: 70px; }
+  .features-title { margin-bottom: 3rem; font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -.035em; }
+  .feature-card { position: relative; height: 100%; padding: 2rem 1.75rem 2.1rem; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-1); transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s; }
+  .feature-card:before { content: ""; position: absolute; inset: 0; background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 0%), rgba(15,139,141,.13), transparent 62%); opacity: 0; transition: opacity .3s; pointer-events: none; }
+  .feature-card:hover { transform: translateY(-6px); border-color: rgba(15,139,141,.4); box-shadow: var(--shadow-2); }
+  .feature-card:hover:before { opacity: 1; }
+  .feature-icon { position: relative; display: grid; place-items: center; width: 58px; height: 58px; margin-bottom: 1.3rem; border-radius: 18px; font-size: 1.35rem; transition: transform .4s var(--ease); }
+  .feature-card:hover .feature-icon { transform: rotate(-8deg) scale(1.1); }
+  .tone-teal { color: var(--brand-d); background: var(--brand-l); }
+  .tone-mark { color: #8a6a00; background: var(--mark-l); }
+  .tone-ink { color: var(--ink-2); background: #e4ebf0; }
+  .feature-card h3 { position: relative; margin-bottom: .55rem; font-size: 1.35rem; }
+  .feature-card p { position: relative; margin: 0; color: var(--muted); line-height: 1.65; }
+  @media (max-width: 575.98px) { .hero-section { padding: 4.5rem 1rem 6rem; } .features { padding-top: 4rem; } }
+</style>
+
+<main>
+  <!-- Hero Section -->
+  <section class="hero-section text-center">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <span class="hero-orb orb-a" aria-hidden="true"></span>
+    <span class="hero-orb orb-b" aria-hidden="true"></span>
+    <div class="container hero-content">
+      <h1 class="hero-title">Welcome to Masync Blog</h1>
+      <p class="lead hero-lead">A place to share your thoughts and ideas</p>
+      <% if (user) { %>
+      <p class="hero-greeting">
+        Hello,
+        <span class="username"><%= user.username %></span>!
+        Welcome back!
+      </p>
+      <a class="btn btn-primary btn-lg" href="/user/profile"
+        ><i class="fas fa-user"></i> Go to your profile</a
+      >
+      <% } else { %>
+      <p class="hero-cta">
+        Please
+        <a class="btn btn-primary btn-lg" href="/auth/login"
+          ><i class="fas fa-sign-in-alt"></i> Login</a
+        >
+        or
+        <a class="btn btn-warning btn-lg" href="/auth/register"
+          ><i class="fas fa-user-plus"></i> Register</a
+        >
+        to continue.
+      </p>
+      <% } %>
+    </div>
+    <a href="#features" class="hero-scroll no-mark" aria-label="Scroll to features"><i class="fas fa-chevron-down"></i></a>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <h1 class="features-title text-center">Application Features</h1>
+      <div class="row">
+        <div class="col-md-6 col-lg-4 mb-4" data-reveal>
+          <div class="feature-card">
+            <div class="feature-icon tone-teal"><i class="fas fa-lock"></i></div>
+            <h3>Authentication</h3>
+            <p>Securely access your account with our robust authentication system.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4" data-reveal>
+          <div class="feature-card">
+            <div class="feature-icon tone-mark"><i class="fas fa-user-shield"></i></div>
+            <h3>Authorization</h3>
+            <p>Control who has access to different parts of the site.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4" data-reveal>
+          <div class="feature-card">
+            <div class="feature-icon tone-ink"><i class="fas fa-sign-in-alt"></i></div>
+            <h3>Login</h3>
+            <p>Quick and easy login process for returning users.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4" data-reveal>
+          <div class="feature-card">
+            <div class="feature-icon tone-ink"><i class="fas fa-sign-out-alt"></i></div>
+            <h3>Logout</h3>
+            <p>Securely log out of your account to protect your data.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4" data-reveal>
+          <div class="feature-card">
+            <div class="feature-icon tone-teal"><i class="fas fa-comments"></i></div>
+            <h3>Comments</h3>
+            <p>Engage with the community by leaving comments on posts.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4" data-reveal>
+          <div class="feature-card">
+            <div class="feature-icon tone-mark"><i class="fas fa-upload"></i></div>
+            <h3>Multiple File Uploads</h3>
+            <p>Easily upload multiple files with our intuitive interface.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  (function () {
+    /* Spotlight that follows the cursor inside each feature card */
+    document.querySelectorAll(".feature-card").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", e.clientX - r.left + "px");
+        card.style.setProperty("--my", e.clientY - r.top + "px");
+      });
+    });
+    /* Gentle parallax on the hero glows */
+    var hero = document.querySelector(".hero-section");
+    var orbs = document.querySelectorAll(".hero-orb");
+    if (hero && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      hero.addEventListener("pointermove", function (e) {
+        var x = (e.clientX / window.innerWidth - .5) * 40, y = (e.clientY / window.innerHeight - .5) * 40;
+        orbs.forEach(function (o, i) { var k = i ? -1 : 1; o.style.transform = "translate(" + x * k + "px," + y * k + "px)"; });
+      });
+    }
+  })();
+</script>
+
+<%- include('partials/footer') %>

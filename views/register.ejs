@@ -1,0 +1,157 @@
+<%- include('partials/header', { title: 'Register', user: user }) %>
+
+<style>
+  .auth-page { position: relative; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - var(--nav-h)); padding: 3rem 1rem; overflow: hidden; }
+  .auth-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .32; pointer-events: none; animation: blog-float 16s ease-in-out infinite alternate; }
+  .auth-blob.b1 { top: -140px; right: -110px; width: 400px; height: 400px; background: var(--brand); }
+  .auth-blob.b2 { left: -90px; bottom: -110px; width: 320px; height: 320px; background: var(--mark); animation-delay: -7s; }
+  .auth-shell { position: relative; display: grid; grid-template-columns: 1fr 1.1fr; width: 100%; max-width: 960px; overflow: hidden; border-radius: 28px; background: var(--surface); box-shadow: var(--shadow-2); animation: blog-rise .8s var(--ease) both; }
+
+  /* Left panel: a post being written */
+  .auth-aside { display: flex; flex-direction: column; justify-content: space-between; gap: 2rem; padding: 2.5rem; color: #fff; background: radial-gradient(90% 70% at 0% 0%, rgba(15,139,141,.55), transparent 62%), linear-gradient(160deg, #12293a, var(--ink)); }
+  .auth-brand { display: flex; align-items: center; gap: .7rem; font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; }
+  .auth-brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; color: var(--ink); background: var(--mark); }
+  .auth-sketch { display: flex; flex-direction: column; gap: .9rem; padding: 1.6rem; border: 1px solid rgba(255,255,255,.1); border-radius: 18px; background: rgba(255,255,255,.06); }
+  .auth-sketch span { display: block; height: 11px; border-radius: 6px; background: rgba(255,255,255,.28); transform-origin: left; animation: auth-write 7s ease infinite; }
+  .auth-sketch .l1 { width: 58%; height: 16px; background: rgba(255,255,255,.55); }
+  .auth-sketch .l2 { width: 100%; background: var(--mark); animation-delay: .8s; }
+  .auth-sketch .l3 { width: 84%; animation-delay: 1.6s; }
+  .auth-sketch .l4 { width: 66%; animation-delay: 2.4s; }
+  .auth-tagline { margin: 0; color: #fff; font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+  @keyframes auth-write { 0% { transform: scaleX(0); opacity: 1; } 14%, 78% { transform: scaleX(1); opacity: 1; } 90% { transform: scaleX(1); opacity: 0; } 100% { transform: scaleX(0); opacity: 0; } }
+
+  /* Right panel: the form */
+  .auth-main { padding: 2.9rem 2.6rem; }
+  .auth-icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 1.1rem; border-radius: 16px; font-size: 1.2rem; color: var(--brand-d); background: var(--brand-l); }
+  .auth-main h2 { margin: 0 0 1.75rem; font-size: 2.1rem; letter-spacing: -.03em; }
+  .input-wrap { position: relative; }
+  .input-wrap > i:first-child { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--soft); pointer-events: none; transition: color .2s; }
+  .input-wrap:focus-within > i:first-child { color: var(--brand); }
+  .input-wrap .form-control { padding-left: 2.9rem; }
+  .input-wrap.has-toggle .form-control { padding-right: 3.2rem; }
+  .toggle-pass { position: absolute; right: .4rem; top: 50%; display: grid; place-items: center; width: 40px; height: 40px; transform: translateY(-50%); border: 0; border-radius: 10px; color: var(--muted); background: transparent; transition: background .2s, color .2s; }
+  .toggle-pass:hover { color: var(--brand-d); background: var(--brand-l); }
+  .auth-submit { margin-top: .6rem; padding: .85rem 1.2rem; font-size: 1.02rem; }
+  .auth-switch { margin: 1.6rem 0 0; color: var(--muted); text-align: center; }
+  .auth-switch p { margin: 0; }
+
+  /* Password strength meter */
+  .strength { display: flex; align-items: center; gap: .75rem; height: 18px; margin-top: .6rem; opacity: 0; transition: opacity .25s; }
+  .strength.on { opacity: 1; }
+  .strength-bars { display: flex; flex: 1; gap: 5px; }
+  .strength-bars i { flex: 1; height: 5px; border-radius: 4px; background: var(--line); transition: background .3s var(--ease); }
+  .strength.s1 .strength-bars i:nth-child(-n+1) { background: var(--danger); }
+  .strength.s2 .strength-bars i:nth-child(-n+2) { background: #f0a23b; }
+  .strength.s3 .strength-bars i:nth-child(-n+3) { background: var(--brand); }
+  .strength.s4 .strength-bars i:nth-child(-n+4) { background: var(--ok); }
+  .strength-label { min-width: 3.4rem; color: var(--muted); font-size: .8rem; font-weight: 600; text-align: right; }
+  @media (max-width: 767.98px) {
+    .auth-shell { grid-template-columns: 1fr; max-width: 480px; }
+    .auth-aside { display: none; }
+    .auth-main { padding: 2.2rem 1.6rem; }
+  }
+</style>
+
+<main class="auth-page">
+  <span class="auth-blob b1" aria-hidden="true"></span>
+  <span class="auth-blob b2" aria-hidden="true"></span>
+  <div class="auth-shell">
+    <aside class="auth-aside" aria-hidden="true">
+      <div class="auth-brand"><span class="auth-brand-mark"><i class="fas fa-pen-nib"></i></span> Masync Blog</div>
+      <div class="auth-sketch"><span class="l1"></span><span class="l2"></span><span class="l3"></span><span class="l4"></span></div>
+      <p class="auth-tagline">A place to share your thoughts and ideas</p>
+    </aside>
+    <div class="auth-main">
+      <div class="auth-icon"><i class="fas fa-user-plus"></i></div>
+      <h2>Register</h2>
+      <% if (error) { %>
+      <div class="alert alert-danger" role="alert"><%= error %></div>
+      <% } %>
+      <form action="/auth/register" method="POST">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <div class="input-wrap">
+            <i class="far fa-user"></i>
+            <input
+              type="text"
+              class="form-control"
+              name="username"
+              id="username"
+              required
+            />
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-wrap">
+            <i class="far fa-envelope"></i>
+            <input
+              type="email"
+              class="form-control"
+              name="email"
+              id="email"
+              required
+            />
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-wrap has-toggle">
+            <i class="fas fa-lock"></i>
+            <input
+              type="password"
+              class="form-control"
+              name="password"
+              id="password"
+              required
+            />
+            <button type="button" class="toggle-pass" aria-label="Show password" aria-pressed="false"><i class="far fa-eye"></i></button>
+          </div>
+          <div class="strength" id="strength" aria-live="polite">
+            <div class="strength-bars"><i></i><i></i><i></i><i></i></div>
+            <span class="strength-label" id="strength-label"></span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 auth-submit">
+          <i class="fas fa-user-plus"></i> Register
+        </button>
+      </form>
+      <div class="auth-switch">
+        <p>Already have an account? <a href="/auth/login">Login</a></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.querySelectorAll(".toggle-pass").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var input = btn.parentNode.querySelector("input");
+      var show = input.type === "password";
+      input.type = show ? "text" : "password";
+      btn.setAttribute("aria-pressed", show);
+      btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      btn.firstElementChild.className = show ? "far fa-eye-slash" : "far fa-eye";
+    });
+  });
+
+  /* Visual-only password strength hint (does not block submission) */
+  (function () {
+    var input = document.getElementById("password");
+    var meter = document.getElementById("strength");
+    var label = document.getElementById("strength-label");
+    var names = ["", "Weak", "Fair", "Good", "Strong"];
+    input.addEventListener("input", function () {
+      var v = input.value, score = 0;
+      if (v.length >= 8) score++;
+      if (/[a-z]/.test(v) && /[A-Z]/.test(v)) score++;
+      if (/\d/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+      if (v && !score) score = 1;
+      meter.className = "strength" + (v ? " on s" + score : "");
+      label.textContent = names[score];
+    });
+  })();
+</script>
+
+<%- include('partials/footer') %>

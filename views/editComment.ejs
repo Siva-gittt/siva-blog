@@ -1,0 +1,43 @@
+<%- include('partials/header', { title: 'Edit Comment', user: user }) %>
+
+<style>
+  .composer-page { padding: 3.5rem 0 2rem; }
+  .composer { max-width: 640px; margin: 0 auto; overflow: hidden; animation: blog-rise .7s var(--ease) backwards; }
+  .composer-head { display: flex; align-items: center; gap: 1rem; padding: 1.6rem 2rem; border-bottom: 1px solid var(--line); background: linear-gradient(120deg, rgba(15,139,141,.1), rgba(255,210,63,.16)); }
+  .composer-icon { display: grid; flex: 0 0 48px; place-items: center; width: 48px; height: 48px; border-radius: 15px; font-size: 1.15rem; color: var(--mark); background: var(--ink); box-shadow: 0 10px 20px -8px rgba(15,30,43,.6); }
+  .composer-head h1 { margin: 0; font-size: 1.7rem; letter-spacing: -.03em; }
+  .composer-body { padding: 2rem; }
+  .composer-body textarea { display: block; width: 100%; min-height: 140px; max-height: 360px; }
+  .composer-actions { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+  @media (max-width: 575.98px) { .composer-head, .composer-body { padding: 1.4rem; } .composer-actions .btn { width: 100%; } }
+</style>
+
+<main class="composer-page">
+  <div class="container">
+    <div class="card composer">
+      <div class="composer-head">
+        <span class="composer-icon"><i class="fas fa-comment-dots"></i></span>
+        <h1>Edit Comment</h1>
+      </div>
+      <form class="composer-body" action="/comments/<%= comment._id %>?_method=PUT" method="POST">
+        <textarea class="form-control" name="content" rows="4" cols="50" required>
+<%= comment.content %></textarea
+        >
+        <div class="composer-actions">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Update Comment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  (function () {
+    var box = document.querySelector(".composer-body textarea");
+    function grow() { box.style.height = "auto"; box.style.height = box.scrollHeight + 2 + "px"; }
+    box.addEventListener("input", grow); grow();
+    box.focus(); box.setSelectionRange(box.value.length, box.value.length);
+  })();
+</script>
+
+<%- include('partials/footer') %>

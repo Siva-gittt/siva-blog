@@ -1,0 +1,42 @@
+    <footer class="blog-footer">
+      <div class="blog-footer-inner">
+        <div class="blog-footer-brand">
+          <span class="blog-footer-mark"><i class="fas fa-pen-nib"></i></span>
+          <div><strong>Siva Blog</strong><span>Ideas, stories and perspectives.</span></div>
+        </div>
+        <p class="blog-footer-copy">&copy; <span id="blog-current-year"></span> Siva Blog. All rights reserved.</p>
+        <a class="blog-back-to-top no-mark" href="#" aria-label="Back to top" title="Back to top"><i class="fas fa-arrow-up"></i></a>
+      </div>
+    </footer>
+
+    <style>
+      .blog-footer { position: relative; flex-shrink: 0; margin-top: auto; padding: 2rem 5%; color: rgba(255,255,255,.7); background: var(--ink, #0f1e2b); }
+      .blog-footer:before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--brand, #0f8b8d), var(--mark, #ffd23f)); }
+      .blog-footer-inner { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      .blog-footer-brand { display: flex; align-items: center; gap: 12px; }
+      .blog-footer-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: var(--ink, #0f1e2b); background: var(--mark, #ffd23f); box-shadow: 0 8px 18px -6px rgba(255,210,63,.5); transition: transform .35s var(--ease, ease); }
+      .blog-footer-brand:hover .blog-footer-mark { transform: rotate(-10deg) scale(1.06); }
+      .blog-footer-brand strong, .blog-footer-brand span { display: block; }
+      .blog-footer-brand strong { color: #fff; font-family: var(--font-display, inherit); font-size: 1.02rem; letter-spacing: -.01em; }
+      .blog-footer-brand div > span { margin-top: 2px; color: rgba(255,255,255,.55); font-size: .8rem; }
+      .blog-footer-copy { margin: 0; font-size: .86rem; text-align: center; }
+      .blog-back-to-top { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; color: #fff; text-decoration: none !important; background: rgba(255,255,255,.06); transition: transform .25s var(--ease, ease), background .2s, border-color .2s, color .2s; }
+      .blog-back-to-top i { transition: transform .25s var(--ease, ease); }
+      .blog-back-to-top:hover, .blog-back-to-top:focus { color: var(--ink, #0f1e2b); background: var(--mark, #ffd23f); border-color: var(--mark, #ffd23f); transform: translateY(-3px); }
+      .blog-back-to-top:hover i { transform: translateY(-2px); }
+      @media (max-width: 640px) { .blog-footer-inner { flex-direction: column; text-align: center; } .blog-footer { padding: 25px 1rem; } }
+    </style>
+
+    <!-- Bootstrap 4 scripts match the existing Bootstrap 4 CSS and data-toggle attributes. -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document.getElementById("blog-current-year").textContent = new Date().getFullYear();
+      document.querySelector(".blog-back-to-top").addEventListener("click", function (event) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    </script>
+  </body>
+</html>
