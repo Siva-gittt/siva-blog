@@ -22,11 +22,11 @@ app.use(express.urlencoded({ extended: true }));
 //session middleware
 app.use(
   session({
-    secret: "keyboard cat",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URL }),
-  })
+  }),
 );
 // Method override middleware
 app.use(methodOverride("_method"));
